@@ -1,0 +1,466 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0b0b0b;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+/* NAVBAR */
+
+.navbar {
+  width: 100%;
+  height: 90px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 50px;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+}
+
+.logo {
+  color: #ff3d3d;
+  font-size: 42px;
+  font-weight: bold;
+}
+
+.search {
+  width: 340px;
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: 1px solid #333;
+  background: rgba(20,20,20,0.9);
+  color: white;
+  outline: none;
+  font-size: 16px;
+}
+
+/* HERO BANNER */
+
+.banner {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  overflow: hidden;
+}
+
+.banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.45;
+}
+
+.bannerOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 80px;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,1),
+    rgba(0,0,0,0.2),
+    transparent
+  );
+}
+
+.bannerOverlay h1 {
+  font-size: 64px;
+  margin-bottom: 20px;
+  width: 700px;
+}
+
+.bannerOverlay p {
+  width: 650px;
+  color: #d0d0d0;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.bannerOverlay button {
+  margin-top: 30px;
+  width: 190px;
+  padding: 16px;
+  border: none;
+  border-radius: 16px;
+  background: #ff3d3d;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.bannerOverlay button:hover {
+  background: #ff1f1f;
+  transform: scale(1.03);
+}
+
+/* ROWS */
+
+.rows {
+  margin-top: -40px;
+  position: relative;
+  z-index: 10;
+  padding: 0 50px 50px;
+}
+
+.row {
+  margin-bottom: 60px;
+}
+
+.row h2 {
+  margin-bottom: 25px;
+  font-size: 32px;
+}
+
+.cards {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.cards::-webkit-scrollbar {
+  height: 8px;
+}
+
+.cards::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 20px;
+}
+
+/* CARDS */
+
+.card {
+  position: relative;
+  min-width: 280px;
+  height: 170px;
+  border-radius: 24px;
+  overflow: hidden;
+  transition: 0.35s;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.card:hover {
+  transform: scale(1.08);
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.6;
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 22px;
+  background: linear-gradient(to top, black, transparent);
+}
+
+.cardOverlay h3 {
+  font-size: 22px;
+  font-weight: bold;
+}
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.fileInput {
+  color: white;
+}
+
+.uploadBtn {
+  background: #ff3d3d;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+/* VIEWER PAGE */
+
+.viewerPage {
+  background: #0b0b0b;
+  min-height: 100vh;
+  color: white;
+}
+
+.viewerNavbar {
+  height: 90px;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  border-bottom: 1px solid #222;
+}
+
+.viewerContent {
+  display: flex;
+  height: calc(100vh - 90px);
+}
+
+.pdfSection {
+  flex: 3;
+  background: #111;
+  overflow: hidden;
+}
+
+.pdfSection iframe {
+  border: none;
+}
+
+.aiPanel {
+  flex: 1;
+  background: #151515;
+  padding: 30px;
+  overflow-y: auto;
+  border-left: 1px solid #222;
+}
+
+.aiPanel h2 {
+  margin-bottom: 25px;
+}
+
+.insightCard {
+  background: #202020;
+  padding: 20px;
+  border-radius: 18px;
+  margin-bottom: 20px;
+  line-height: 1.7;
+}
+/* INTELLIGENT CARDS */
+
+.intelligentCard {
+  background: #171717;
+  width: 320px;
+  height: 360px;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  border: 1px solid #242424;
+  flex-shrink: 0;
+}
+
+.intelligentCard:hover {
+  transform: translateY(-5px);
+  background: #1d1d1d;
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.severityBadge {
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.severityBadge.Low {
+  background: #1e4620;
+  color: #7dff88;
+}
+
+.severityBadge.Medium {
+  background: #4a3d11;
+  color: #ffd95e;
+}
+
+.severityBadge.High {
+  background: #5a1b1b;
+  color: #ff7b7b;
+}
+
+.severityBadge.Critical {
+  background: #7a0000;
+  color: white;
+}
+
+.riskScore {
+  font-size: 14px;
+  color: #bbbbbb;
+}
+
+.cardContent {
+  padding: 16px;
+}
+
+.cardContent h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.pdfTitle {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: white;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.incidentType {
+  color: #ffb347;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.department {
+  color: #9a9a9a;
+  font-size: 14px;
+}
+.previewArea {
+  height: 180px;
+  width: 100%;
+  background: #111;
+  overflow: hidden;
+}
+
+.previewArea iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  pointer-events: none;
+}
+.relatedSection {
+  margin-top: 40px;
+  padding: 20px;
+}
+
+.relatedSection h2 {
+  margin-bottom: 20px;
+}
+
+.relatedGrid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.relatedCard {
+  background: #171717;
+  padding: 20px;
+  border-radius: 18px;
+  width: 260px;
+  border: 1px solid #242424;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.relatedCard:hover {
+  transform: translateY(-4px);
+  background: #1f1f1f;
+}
+
+.relatedCard h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.relatedCard p {
+  color: #ffb347;
+  margin-bottom: 8px;
+}
+
+.relatedCard span {
+  color: #999;
+}
+/* GLOBAL SCROLLBAR */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111;
+}
+.authPage {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0b0b0b;
+}
+
+.authCard {
+  width: 420px;
+  background: #171717;
+  padding: 40px;
+  border-radius: 24px;
+  border: 1px solid #242424;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.authCard h1 {
+  color: #ff3d3d;
+  font-size: 42px;
+}
+
+.authCard h2 {
+  margin-bottom: 10px;
+}
+
+.authCard input {
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid #333;
+  background: #101010;
+  color: white;
+  font-size: 16px;
+}
+
+.authCard button {
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  background: #ff3d3d;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.switchAuth {
+  color: #aaa;
+  cursor: pointer;
+  text-align: center;
+}
