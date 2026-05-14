@@ -132,26 +132,6 @@ async def upload_file(file: UploadFile = File(...)):
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # DOCX Conversion
-    if file.filename.endswith(".docx"):
-
-        subprocess.run([
-            r"C:\Program Files\LibreOffice\program\soffice.exe",
-            "--headless",
-            "--convert-to",
-            "pdf",
-            file_path,
-            "--outdir",
-            UPLOAD_FOLDER
-        ])
-
-        pdf_filename = file.filename.replace(".docx", ".pdf")
-
-        file_path = os.path.join(UPLOAD_FOLDER, pdf_filename)
-
-        filename = pdf_filename
-
-    else:
         filename = file.filename
 
     # AI PROCESSING
