@@ -3,3 +3,7 @@ gunicorn
 flask-cors
 PyMuPDF
 uvicorn
+fastapi
+sqlalchemy
+pydantic
+python-multipart
