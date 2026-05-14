@@ -8,3 +8,4 @@ sqlalchemy
 pydantic
 python-multipart
 python-jose
+python-docx
