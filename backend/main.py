@@ -32,7 +32,9 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 # Allow frontend connection
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://case-flix.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
