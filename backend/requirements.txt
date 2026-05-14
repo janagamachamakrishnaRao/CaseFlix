@@ -7,3 +7,4 @@ fastapi
 sqlalchemy
 pydantic
 python-multipart
+python-jose
