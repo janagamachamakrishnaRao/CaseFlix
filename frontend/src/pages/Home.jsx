@@ -25,7 +25,7 @@ export default function Home() {
 
     try {
 
-      const response = await fetch("http://127.0.0.1:8000/files");
+      const response = await fetch("https://caseflix-backend.onrender.com/files");
 
       const data = await response.json();
 
@@ -49,7 +49,7 @@ export default function Home() {
     try {
 
       const response = await fetch(
-        `http://127.0.0.1:8000/search/${query}`
+        `https://caseflix-backend.onrender.com/search/${query}`
       );
 
       const data = await response.json();
@@ -75,7 +75,7 @@ export default function Home() {
 
     try {
 
-      const response = await fetch("http://127.0.0.1:8000/upload", {
+      const response = await fetch("https://caseflix-backend.onrender.com/upload", {
         method: "POST",
         body: formData,
       });
@@ -188,7 +188,7 @@ export default function Home() {
                 <div className="previewArea">
 
                   <iframe
-                    src={`http://127.0.0.1:8000/uploads/${item.filename}`}
+                    src={`https://caseflix-backend.onrender.com/uploads/${item.filename}`}
                     title="preview"
                   />
 
