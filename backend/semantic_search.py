@@ -1,11 +1,51 @@
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
+try:
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+    from sentence_transformers import SentenceTransformer
+    from sklearn.metrics.pairwise import cosine_similarity
+    import numpy as np
+
+    model = SentenceTransformer(
+        'all-MiniLM-L6-v2'
+    )
+
+    AI_ENABLED = True
+
+except:
+
+    AI_ENABLED = False
+
 
 def semantic_search(query, incident_data):
 
+    # FALLBACK SEARCH
+    if not AI_ENABLED:
+
+        results = []
+
+        query = query.lower()
+
+        for item in incident_data:
+
+            metadata = item["metadata"]
+
+            combined_text = f"""
+            {item['filename']}
+            {metadata['incident_type']}
+            {metadata['department']}
+            {metadata.get('location', '')}
+            {metadata['summary']}
+            """.lower()
+
+            if query in combined_text:
+
+                results.append({
+                    "score": 1.0,
+                    "data": item
+                })
+
+        return results
+
+    # REAL AI SEARCH
     if not incident_data:
         return []
 
@@ -19,6 +59,7 @@ def semantic_search(query, incident_data):
         {item['filename']}
         {metadata['incident_type']}
         {metadata['department']}
+        {metadata.get('location', '')}
         {metadata['summary']}
         """
 
@@ -33,7 +74,9 @@ def semantic_search(query, incident_data):
         document_embeddings
     )[0]
 
-    ranked_results = np.argsort(similarities)[::-1]
+    ranked_results = np.argsort(
+        similarities
+    )[::-1]
 
     results = []
 
@@ -42,8 +85,13 @@ def semantic_search(query, incident_data):
         if similarities[idx] > 0.25:
 
             results.append({
-                "score": float(similarities[idx]),
+
+                "score": float(
+                    similarities[idx]
+                ),
+
                 "data": incident_data[idx]
+
             })
 
     return results
