@@ -15,6 +15,8 @@ class Incident(Base):
 
     department = Column(String)
 
+    location = Column(String)
+
     risk_score = Column(Integer)
 
     summary = Column(Text)

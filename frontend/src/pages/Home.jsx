@@ -8,6 +8,23 @@ export default function Home() {
   const [file, setFile] = useState(null);
   const [files, setFiles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [department, setDepartment] = useState("");
+  const [location, setLocation] = useState("");
+
+  const groupedDepartments = files.reduce((acc, item) => {
+
+  const dept =
+    item.metadata?.department || "Other";
+
+  if (!acc[dept]) {
+    acc[dept] = [];
+  }
+
+  acc[dept].push(item);
+
+  return acc;
+
+}, {});
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -25,7 +42,7 @@ export default function Home() {
 
     try {
 
-      const response = await fetch("https://caseflix-backend.onrender.com/files");
+      const response = await fetch("http://127.0.0.1:8000/files");
 
       const data = await response.json();
 
@@ -48,9 +65,11 @@ export default function Home() {
 
     try {
 
-      const response = await fetch(
-        `https://caseflix-backend.onrender.com/search/${query}`
-      );
+      
+    const response = await fetch(
+  `http://127.0.0.1:8000/search/${query}`
+);
+      
 
       const data = await response.json();
 
@@ -64,7 +83,7 @@ export default function Home() {
   // FILE UPLOAD
   const uploadFile = async () => {
 
-    if (!file) {
+    if (!file || !department || !location) {
       alert("Please select a file");
       return;
     }
@@ -72,10 +91,12 @@ export default function Home() {
     const formData = new FormData();
 
     formData.append("file", file);
+    formData.append("department", department);
+    formData.append("location", location);
 
     try {
 
-      const response = await fetch("https://caseflix-backend.onrender.com/upload", {
+      const response = await fetch("http://127.0.0.1:8000/upload", {
         method: "POST",
         body: formData,
       });
@@ -114,11 +135,56 @@ export default function Home() {
             onChange={(e) => searchCases(e.target.value)}
           />
 
-          <input
-            type="file"
-            onChange={(e) => setFile(e.target.files[0])}
-            className="fileInput"
-          />
+          <label className="customFileUpload">
+
+            Choose File
+
+            <input
+              type="file"
+              hidden
+              onChange={(e) => setFile(e.target.files[0])}
+            />
+
+          </label>
+
+          <span className="selectedFileName">
+
+            {file ? file.name : "No file chosen"}
+
+          </span>
+          <select
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="search"
+                >
+
+                  <option value="">Department</option>
+
+                  <option value="CRFS">CRFS</option>
+
+                  <option value="CRSS">CRSS</option>
+
+                  <option value="ICD">ICD</option>
+
+                  <option value="RAILWAY">RAILWAY</option>
+
+                  <option value="SOPS">SOPS</option>
+
+                  <option value="NEW SOPS">NEW SOPS</option>
+
+                  <option value="APPROVAL SOP">
+                    APPROVAL SOP
+                  </option>
+
+                </select>
+
+                <input
+                  type="text"
+                  placeholder="Location"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="search"
+                />
 
           <button
             onClick={uploadFile}
@@ -154,71 +220,131 @@ export default function Home() {
 
       </div>
 
-      {/* INCIDENT CARDS */}
+     {/* OTT DEPARTMENT ROWS */}
       <div className="rows">
 
-        <div className="row">
+        {Object.entries(groupedDepartments).map(
+          ([department, deptFiles]) => (
 
-          <h2>Uploaded Cases</h2>
+            <div className="row" key={department}>
 
-          <div className="cards">
+              <h2>{department}</h2>
 
-            {files && files.map((item, index) => (
+              <div className="cards">
 
-              <div
-                className="card intelligentCard"
-                key={index}
-                onClick={() => navigate(`/case/${item.filename}`)}
-              >
+                {deptFiles.map((item, index) => (
 
-                {/* TOP SECTION */}
-                <div className="cardTop">
+                  <div
+                    className="card intelligentCard"
+                    key={index}
+                    onClick={() =>
+                      navigate(`/case/${item.filename}`)
+                    }
+                  >
 
-                      <div className={`severityBadge ${item.metadata?.severity || "Low"}`}>
-                        {item.metadata?.severity || "Low"}
+                    {/* TOP */}
+                      <div className="cardTop">
+
+                        <div className="cardMenu">
+
+                          <button
+                            className="menuBtn"
+                            onClick={(e) => {
+
+                              e.stopPropagation();
+
+                              const action = prompt(
+                                "Type: rename or delete"
+                              );
+
+                              // DELETE
+                              if (action === "delete") {
+
+                                fetch(
+                                  `http://127.0.0.1:8000/delete/${item.filename}`,
+                                  {
+                                    method: "DELETE"
+                                  }
+                                )
+                                .then(() => fetchFiles());
+
+                              }
+
+                              // RENAME
+                              if (action === "rename") {
+
+                                const newName = prompt(
+                                  "Enter new filename"
+                                );
+
+                                if (!newName) return;
+
+                                fetch(
+                                  `http://127.0.0.1:8000/rename/${item.filename}`,
+                                  {
+                                    method: "PUT",
+                                    headers: {
+                                      "Content-Type":
+                                        "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                      new_filename: newName
+                                    })
+                                  }
+                                )
+                                .then(() => fetchFiles());
+
+                              }
+
+                            }}
+                          >
+                            ⋮
+                          </button>
+
+                        </div>
+
                       </div>
 
-                  <div className="riskScore">
-                  Risk {item.metadata?.risk_score || 0}%
-                </div>
+                    {/* PDF */}
+                    <div className="previewArea">
 
-                </div>
+                      <iframe
+                        src={`http://127.0.0.1:8000/uploads/${item.filename}`}
+                        title="preview"
+                      />
 
-                {/* PDF PREVIEW */}
-                <div className="previewArea">
+                    </div>
 
-                  <iframe
-                    src={`https://caseflix-backend.onrender.com/uploads/${item.filename}`}
-                    title="preview"
-                  />
+                    {/* CONTENT */}
+                    <div className="cardContent">
 
-                </div>
+                      <h3 className="pdfTitle">
+                        {item.filename}
+                      </h3>
 
-                {/* CONTENT */}
-                <div className="cardContent">
+                      <p className="incidentType">
+                        {item.metadata?.incident_type || "Unknown"}
+                      </p>
 
-                  <h3 className="pdfTitle">
-                    {item.filename}
-                  </h3>
+                      <p className="department">
+                        📍 {
+                          item.metadata?.location ||
+                          "Unknown Location"
+                        }
+                      </p>
 
-                  <p className="incidentType">
-                    {item.metadata?.incident_type || "Unknown"}
-                  </p>
+                    </div>
 
-                  <p className="department">
-                    {item.metadata?.department || "Unknown"}
-                  </p>
-  
+                  </div>
 
-                </div>
+                ))}
 
               </div>
 
-            ))}
+            </div>
 
-          </div>
-
-        </div>
+          )
+        )}
 
       </div>
 

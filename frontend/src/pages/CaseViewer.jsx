@@ -12,7 +12,7 @@ export default function CaseViewer() {
   // FETCH CURRENT CASE
   useEffect(() => {
 
-    fetch("https://caseflix-backend.onrender.com/files")
+    fetch("http://127.0.0.1:8000/files")
       .then((res) => res.json())
       .then((data) => {
 
@@ -28,7 +28,7 @@ export default function CaseViewer() {
   // FETCH RELATED CASES
   useEffect(() => {
 
-    fetch(`https://caseflix-backend.onrender.com/related/${filename}`)
+    fetch(`http://127.0.0.1:8000/related/${filename}`)
       .then((res) => res.json())
       .then((data) => setRelatedCases(data.related));
 
@@ -56,7 +56,7 @@ export default function CaseViewer() {
         <div className="pdfSection">
 
           <iframe
-            src={`https://caseflix-backend.onrender.com/uploads/${filename}`}
+            src={`http://127.0.0.1:8000/uploads/${filename}`}
             title="PDF Viewer"
             width="100%"
             height="100%"
@@ -99,6 +99,17 @@ export default function CaseViewer() {
 
             <span>
               {caseData.metadata?.department}
+            </span>
+
+          </div>
+          <div className="insightCard">
+
+            <p>
+              <strong>Location:</strong>
+            </p>
+
+            <span>
+              {caseData.metadata?.location}
             </span>
 
           </div>
