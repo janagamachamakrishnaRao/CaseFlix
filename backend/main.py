@@ -1,55 +1,86 @@
 from ai_engine import extract_text, generate_ai_metadata
-from fastapi import FastAPI, UploadFile, File, Form
+
+from fastapi import (
+    FastAPI,
+    UploadFile,
+    File,
+    Form,
+    HTTPException
+)
+
 from fastapi.middleware.cors import CORSMiddleware
+
 from fastapi.staticfiles import StaticFiles
-from database import SessionLocal, engine
-from models import Incident
-from database import Base
+
+from database import (
+    SessionLocal,
+    engine,
+    Base
+)
+
+from models import (
+    Incident,
+    User
+)
+
 from sqlalchemy import or_
-import shutil
-import os
-from converter import convert_to_pdf
-from fastapi import HTTPException
+
 from pydantic import BaseModel
+
+from converter import convert_to_pdf
+
 from auth import (
     hash_password,
     verify_password,
     create_access_token
 )
-from models import User
 
+import shutil
+import os
+
+
+# CREATE DATABASE
 Base.metadata.create_all(bind=engine)
 
+# FASTAPI APP
+app = FastAPI(title="CaseFlix API")
 
-app = FastAPI()
+# UPLOADS FOLDER
+UPLOAD_FOLDER = "uploads"
 
-class UserAuth(BaseModel):
-    username: str
-    password: str
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+# STATIC FILES
+app.mount(
+    "/uploads",
+    StaticFiles(directory="uploads"),
+    name="uploads"
+)
 
-# Allow frontend connection
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-UPLOAD_FOLDER = "uploads"
 
-# Create uploads folder if not exists
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# ---------------- AUTH ---------------- #
+
+class UserAuth(BaseModel):
+    username: str
+    password: str
 
 
 @app.get("/")
 def home():
-    return {"message": "CaseFlix Backend Running"}
+
+    return {
+        "message": "CaseFlix Backend Running"
+    }
+
 
 @app.post("/register")
 def register(user: UserAuth):
@@ -61,7 +92,9 @@ def register(user: UserAuth):
     ).first()
 
     if existing_user:
+
         db.close()
+
         raise HTTPException(
             status_code=400,
             detail="Username already exists"
@@ -75,12 +108,15 @@ def register(user: UserAuth):
     )
 
     db.add(new_user)
+
     db.commit()
+
     db.close()
 
     return {
         "message": "User registered successfully"
     }
+
 
 @app.post("/login")
 def login(user: UserAuth):
@@ -92,7 +128,9 @@ def login(user: UserAuth):
     ).first()
 
     if not existing_user:
+
         db.close()
+
         raise HTTPException(
             status_code=401,
             detail="Invalid username"
@@ -104,7 +142,9 @@ def login(user: UserAuth):
     )
 
     if not valid:
+
         db.close()
+
         raise HTTPException(
             status_code=401,
             detail="Invalid password"
@@ -125,6 +165,9 @@ def login(user: UserAuth):
         "username": existing_user.username
     }
 
+
+# ---------------- UPLOAD ---------------- #
+
 @app.post("/upload")
 async def upload_file(
     file: UploadFile = File(...),
@@ -138,9 +181,13 @@ async def upload_file(
     )
 
     with open(original_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
 
-    # UNIVERSAL CONVERSION
+        shutil.copyfileobj(
+            file.file,
+            buffer
+        )
+
+    # CONVERT FILE
     pdf_file = convert_to_pdf(original_path)
 
     filename = os.path.basename(pdf_file)
@@ -148,29 +195,43 @@ async def upload_file(
     # EXTRACT TEXT
     text = extract_text(pdf_file)
 
+    # AI METADATA
     metadata = generate_ai_metadata(text)
+
     db = SessionLocal()
-    
+
     new_incident = Incident(
-    filename=filename,
-    
-    incident_type=metadata["incident_type"],
-    department=department,
-    location=location,
-    
-    summary=metadata["summary"]
+
+        filename=filename,
+
+        incident_type=metadata["incident_type"],
+
+        department=department,
+
+        location=location,
+
+        summary=metadata["summary"]
+
     )
 
     db.add(new_incident)
+
     db.commit()
+
     db.close()
 
-
     return {
+
         "filename": filename,
+
         "message": "File processed successfully",
+
         "metadata": metadata
+
     }
+
+
+# ---------------- GET FILES ---------------- #
 
 @app.get("/files")
 def get_files():
@@ -184,20 +245,31 @@ def get_files():
     for item in incidents:
 
         results.append({
+
             "filename": item.filename,
+
             "metadata": {
-                
+
                 "incident_type": item.incident_type,
+
                 "department": item.department,
+
                 "location": item.location,
-               
+
                 "summary": item.summary
+
             }
+
         })
 
     db.close()
 
-    return {"files": results}
+    return {
+        "files": results
+    }
+
+
+# ---------------- RELATED CASES ---------------- #
 
 @app.get("/related/{filename}")
 def get_related_cases(filename: str):
@@ -209,12 +281,20 @@ def get_related_cases(filename: str):
     ).first()
 
     if not current_case:
+
         db.close()
-        return {"related": []}
+
+        return {
+            "related": []
+        }
 
     related_cases = db.query(Incident).filter(
-        Incident.incident_type == current_case.incident_type,
+
+        Incident.incident_type ==
+        current_case.incident_type,
+
         Incident.filename != filename
+
     ).limit(4).all()
 
     results = []
@@ -222,20 +302,31 @@ def get_related_cases(filename: str):
     for item in related_cases:
 
         results.append({
+
             "filename": item.filename,
+
             "metadata": {
+
                 "incident_type": item.incident_type,
+
                 "department": item.department,
-                
+
                 "location": item.location,
-                
+
                 "summary": item.summary
+
             }
+
         })
 
     db.close()
 
-    return {"related": results}
+    return {
+        "related": results
+    }
+
+
+# ---------------- SEARCH ---------------- #
 
 @app.get("/search/{query}")
 def search_cases(query: str):
@@ -247,11 +338,22 @@ def search_cases(query: str):
         or_(
 
             Incident.filename.ilike(f"%{query}%"),
-            Incident.incident_type.ilike(f"%{query}%"),
-            Incident.department.ilike(f"%{query}%"),
-            Incident.location.ilike(f"%{query}%"),
-            
-            Incident.summary.ilike(f"%{query}%")
+
+            Incident.incident_type.ilike(
+                f"%{query}%"
+            ),
+
+            Incident.department.ilike(
+                f"%{query}%"
+            ),
+
+            Incident.location.ilike(
+                f"%{query}%"
+            ),
+
+            Incident.summary.ilike(
+                f"%{query}%"
+            )
 
         )
 
@@ -268,8 +370,11 @@ def search_cases(query: str):
             "metadata": {
 
                 "incident_type": item.incident_type,
+
                 "department": item.department,
+
                 "location": item.location,
+
                 "summary": item.summary
 
             }
@@ -278,7 +383,13 @@ def search_cases(query: str):
 
     db.close()
 
-    return {"results": final_results}
+    return {
+        "results": final_results
+    }
+
+
+# ---------------- DELETE ---------------- #
+
 @app.delete("/delete/{filename}")
 def delete_case(filename: str):
 
@@ -289,29 +400,35 @@ def delete_case(filename: str):
     ).first()
 
     if not incident:
+
         db.close()
+
         raise HTTPException(
             status_code=404,
             detail="Case not found"
         )
 
-    # DELETE FILE
     file_path = os.path.join(
         UPLOAD_FOLDER,
         filename
     )
 
     if os.path.exists(file_path):
+
         os.remove(file_path)
 
-    # DELETE DATABASE RECORD
     db.delete(incident)
+
     db.commit()
+
     db.close()
 
     return {
         "message": "Case deleted successfully"
     }
+
+
+# ---------------- RENAME ---------------- #
 
 class RenameRequest(BaseModel):
     new_filename: str
@@ -330,7 +447,9 @@ def rename_case(
     ).first()
 
     if not incident:
+
         db.close()
+
         raise HTTPException(
             status_code=404,
             detail="Case not found"
@@ -346,17 +465,16 @@ def rename_case(
         request.new_filename
     )
 
-    # RENAME FILE
     if os.path.exists(old_path):
+
         os.rename(old_path, new_path)
 
-    # UPDATE DATABASE
     incident.filename = request.new_filename
 
     db.commit()
+
     db.close()
 
     return {
         "message": "Case renamed successfully"
     }
-

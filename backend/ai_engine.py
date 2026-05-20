@@ -1,35 +1,42 @@
 import fitz
-import random
 from docx import Document
+import pandas as pd
 
 
 def extract_text(file_path):
+
+    text = ""
 
     # PDF SUPPORT
     if file_path.endswith(".pdf"):
 
         doc = fitz.open(file_path)
 
-        text = ""
-
         for page in doc:
             text += page.get_text()
-
-        return text
 
     # DOCX SUPPORT
     elif file_path.endswith(".docx"):
 
         doc = Document(file_path)
 
-        text = ""
-
         for para in doc.paragraphs:
             text += para.text + "\n"
 
-        return text
+    # EXCEL SUPPORT
+    elif file_path.endswith(".xlsx"):
 
-    return ""
+        df = pd.read_excel(file_path)
+
+        text = df.to_string()
+
+    # TXT SUPPORT
+    elif file_path.endswith(".txt"):
+
+        with open(file_path, "r", encoding="utf-8") as file:
+            text = file.read()
+
+    return text
 
 
 def generate_ai_metadata(text):

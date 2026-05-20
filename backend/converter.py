@@ -1,11 +1,8 @@
 import os
 
 from PIL import Image
-
 from reportlab.pdfgen import canvas
 from openpyxl import load_workbook
-
-from docx2pdf import convert
 
 
 def convert_to_pdf(file_path):
@@ -18,19 +15,38 @@ def convert_to_pdf(file_path):
     if ext == ".pdf":
         return file_path
 
-    # DOCX → PDF
+    # DOCX
     elif ext == ".docx":
 
-        convert(file_path, pdf_path)
+        # Azure-safe fallback
+        c = canvas.Canvas(pdf_path)
+
+        c.drawString(
+            100,
+            750,
+            "DOCX Preview Conversion"
+        )
+
+        c.drawString(
+            100,
+            720,
+            os.path.basename(file_path)
+        )
+
+        c.save()
 
         return pdf_path
 
-    # TXT → PDF
+    # TXT
     elif ext == ".txt":
 
         c = canvas.Canvas(pdf_path)
 
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(
+            file_path,
+            "r",
+            encoding="utf-8"
+        ) as f:
 
             lines = f.readlines()
 
@@ -38,15 +54,23 @@ def convert_to_pdf(file_path):
 
         for line in lines:
 
-            c.drawString(40, y, line[:100])
+            c.drawString(
+                40,
+                y,
+                line[:100]
+            )
 
             y -= 20
+
+            if y < 40:
+                c.showPage()
+                y = 800
 
         c.save()
 
         return pdf_path
-    
-        # XLSX → PDF
+
+    # XLSX
     elif ext == ".xlsx":
 
         workbook = load_workbook(file_path)
@@ -63,7 +87,11 @@ def convert_to_pdf(file_path):
                 [str(cell) for cell in row if cell]
             )
 
-            c.drawString(40, y, row_text[:120])
+            c.drawString(
+                40,
+                y,
+                row_text[:120]
+            )
 
             y -= 20
 
@@ -75,7 +103,7 @@ def convert_to_pdf(file_path):
 
         return pdf_path
 
-    # IMAGE → PDF
+    # IMAGE
     elif ext in [".jpg", ".jpeg", ".png"]:
 
         image = Image.open(file_path)
