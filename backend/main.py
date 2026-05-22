@@ -78,11 +78,7 @@ class UserAuth(BaseModel):
 
 @app.get("/")
 def home():
-
-    return {
-        "message": "CaseFlix Backend Running"
-    }
-
+    return FileResponse("dist/index.html")
 
 @app.post("/register")
 def register(user: UserAuth):
@@ -483,7 +479,7 @@ def rename_case(
 # Serve React static assets
 app.mount("/assets", StaticFiles(directory="dist/assets"), name="assets")
 
-    # Serve React app for all other routes
+# Serve React app for all other routes
 @app.get("/{full_path:path}")
 def serve_react(full_path: str):
     return FileResponse("dist/index.html")
