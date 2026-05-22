@@ -1,9 +1,16 @@
 {
   "build": {
-    "builder": "NIXPACKS"
+    "builder": "NIXPACKS",
+    "nixpacksPlan": {
+      "phases": {
+        "setup": {
+          "nixPkgs": ["python312", "weasyprint", "pango", "cairo", "gdk-pixbuf"]
+        }
+      }
+    }
   },
   "deploy": {
-    "startCommand": "gunicorn -w 2 -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:$PORT",
+    "startCommand": "gunicorn -w 1 -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:8080",
     "restartPolicyType": "ON_FAILURE"
   }
 }
