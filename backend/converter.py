@@ -1,6 +1,4 @@
 import os
-import mammoth
-import weasyprint
 
 from PIL import Image
 from reportlab.pdfgen import canvas
@@ -17,27 +15,34 @@ def convert_to_pdf(file_path):
     if ext == ".pdf":
         return file_path
 
-    # DOCX
-    # DOCX
     elif ext == ".docx":
-        
-        with open(file_path, "rb") as docx_file:
-            result = mammoth.convert_to_html(docx_file)
-            html = result.value
-        
-        html_with_style = f"""
-        <html>
-        <head>
-        <style>
+        try:
+            import mammoth
+            import weasyprint
+            with open(file_path, "rb") as docx_file:
+                result = mammoth.convert_to_html(docx_file)
+                html = result.value
+            html_with_style = f"""
+            <html><head><style>
             body {{ font-family: Arial; font-size: 12px; margin: 40px; }}
-        </style>
-        </head>
-        <body>{html}</body>
-        </html>
-        """
-        
-        weasyprint.HTML(string=html_with_style).write_pdf(pdf_path)
-        return pdf_path
+            </style></head><body>{html}</body></html>
+            """
+            weasyprint.HTML(string=html_with_style).write_pdf(pdf_path)
+            return pdf_path
+        except ImportError:
+            from docx import Document as DocxDocument
+            c = canvas.Canvas(pdf_path)
+            doc = DocxDocument(file_path)
+            y = 800
+            for para in doc.paragraphs:
+                if para.text.strip():
+                    c.drawString(40, y, para.text[:100])
+                    y -= 20
+                    if y < 40:
+                        c.showPage()
+                        y = 800
+            c.save()
+            return pdf_path
 
     # TXT
     elif ext == ".txt":
