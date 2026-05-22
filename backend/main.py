@@ -41,10 +41,10 @@ import os
 
 
 # CREATE DATABASE
-try:
+import threading
+db_lock = threading.Lock()
+with db_lock:
     Base.metadata.create_all(bind=engine)
-except:
-    pass
 
 # FASTAPI APP
 app = FastAPI(title="CaseFlix API")
