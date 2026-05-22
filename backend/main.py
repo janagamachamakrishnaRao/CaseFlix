@@ -7,6 +7,7 @@ from fastapi import (
     Form,
     HTTPException
 )
+from fastapi.responses import FileResponse
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -478,3 +479,10 @@ def rename_case(
     return {
         "message": "Case renamed successfully"
     }
+# Serve React static assets
+app.mount("/assets", StaticFiles(directory="dist/assets"), name="assets")
+
+    # Serve React app for all other routes
+@app.get("/{full_path:path}")
+def serve_react(full_path: str):
+    return FileResponse("dist/index.html")

@@ -17,33 +17,30 @@ except:
 
 def semantic_search(query, incident_data):
 
-    # FALLBACK SEARCH
-    if not AI_ENABLED:
+    results = []
 
-        results = []
+    query = query.lower()
 
-        query = query.lower()
+    for item in incident_data:
 
-        for item in incident_data:
+        metadata = item["metadata"]
 
-            metadata = item["metadata"]
+        combined_text = f"""
+        {item['filename']}
+        {metadata['incident_type']}
+        {metadata['department']}
+        {metadata.get('location', '')}
+        {metadata['summary']}
+        """.lower()
 
-            combined_text = f"""
-            {item['filename']}
-            {metadata['incident_type']}
-            {metadata['department']}
-            {metadata.get('location', '')}
-            {metadata['summary']}
-            """.lower()
+        if query in combined_text:
 
-            if query in combined_text:
+            results.append({
+                "score": 1.0,
+                "data": item
+            })
 
-                results.append({
-                    "score": 1.0,
-                    "data": item
-                })
-
-        return results
+    return results
 
     # REAL AI SEARCH
     if not incident_data:

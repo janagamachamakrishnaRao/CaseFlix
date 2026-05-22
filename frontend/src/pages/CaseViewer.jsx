@@ -12,7 +12,7 @@ export default function CaseViewer() {
   // FETCH CURRENT CASE
   useEffect(() => {
 
-    fetch("http://127.0.0.1:8000/files")
+    fetch("/files")
       .then((res) => res.json())
       .then((data) => {
 
@@ -28,7 +28,7 @@ export default function CaseViewer() {
   // FETCH RELATED CASES
   useEffect(() => {
 
-    fetch(`http://127.0.0.1:8000/related/${filename}`)
+    fetch(`/related/${filename}`)
       .then((res) => res.json())
       .then((data) => setRelatedCases(data.related));
 
@@ -56,7 +56,7 @@ export default function CaseViewer() {
         <div className="pdfSection">
 
           <iframe
-            src={`http://127.0.0.1:8000/uploads/${filename}`}
+            src={`/uploads/${filename}`}
             title="PDF Viewer"
             width="100%"
             height="100%"

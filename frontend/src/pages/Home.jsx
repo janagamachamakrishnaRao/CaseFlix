@@ -42,7 +42,7 @@ export default function Home() {
 
     try {
 
-      const response = await fetch("http://127.0.0.1:8000/files");
+      const response = await fetch("/files");
 
       const data = await response.json();
 
@@ -67,7 +67,7 @@ export default function Home() {
 
       
     const response = await fetch(
-  `http://127.0.0.1:8000/search/${query}`
+  `/search/${query}`
 );
       
 
@@ -96,7 +96,7 @@ export default function Home() {
 
     try {
 
-      const response = await fetch("http://127.0.0.1:8000/upload", {
+      const response = await fetch("/upload", {
         method: "POST",
         body: formData,
       });
@@ -261,7 +261,7 @@ export default function Home() {
                               if (action === "delete") {
 
                                 fetch(
-                                  `http://127.0.0.1:8000/delete/${item.filename}`,
+                                  `/delete/${item.filename}`,
                                   {
                                     method: "DELETE"
                                   }
@@ -280,7 +280,7 @@ export default function Home() {
                                 if (!newName) return;
 
                                 fetch(
-                                  `http://127.0.0.1:8000/rename/${item.filename}`,
+                                  `/rename/${item.filename}`,
                                   {
                                     method: "PUT",
                                     headers: {
@@ -309,7 +309,7 @@ export default function Home() {
                     <div className="previewArea">
 
                       <iframe
-                        src={`http://127.0.0.1:8000/uploads/${item.filename}`}
+                        src={`/uploads/${item.filename}`}
                         title="preview"
                       />
 
