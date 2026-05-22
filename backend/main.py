@@ -41,8 +41,10 @@ import os
 
 
 # CREATE DATABASE
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+except:
+    pass
 
 # FASTAPI APP
 app = FastAPI(title="CaseFlix API")
