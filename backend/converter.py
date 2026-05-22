@@ -16,25 +16,22 @@ def convert_to_pdf(file_path):
         return file_path
 
     # DOCX
+    # DOCX
     elif ext == ".docx":
-
-        # Azure-safe fallback
+        from docx import Document as DocxDocument
         c = canvas.Canvas(pdf_path)
-
-        c.drawString(
-            100,
-            750,
-            "DOCX Preview Conversion"
-        )
-
-        c.drawString(
-            100,
-            720,
-            os.path.basename(file_path)
-        )
-
+        doc = DocxDocument(file_path)
+        y = 800
+        for para in doc.paragraphs:
+            if para.text.strip():
+                # wrap long lines
+                text = para.text[:100]
+                c.drawString(40, y, text)
+                y -= 20
+                if y < 40:
+                    c.showPage()
+                    y = 800
         c.save()
-
         return pdf_path
 
     # TXT
