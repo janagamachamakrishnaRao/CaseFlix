@@ -174,18 +174,20 @@ async def upload_file(
     department: str = Form(...),
     location: str = Form(...)
 ):
-
-    original_path = os.path.join(
-        UPLOAD_FOLDER,
-        file.filename
-    )
+    original_path = os.path.join(UPLOAD_FOLDER, file.filename)
 
     with open(original_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
 
-        shutil.copyfileobj(
-            file.file,
-            buffer
-        )
+    # CONVERT FILE
+    pdf_file = convert_to_pdf(original_path)
+
+    # DELETE original if it was converted
+    if pdf_file != original_path and os.path.exists(original_path):
+        os.remove(original_path)
+
+    filename = os.path.basename(pdf_file)
+    # ... rest stays same
 
     # CONVERT FILE
     pdf_file = convert_to_pdf(original_path)
