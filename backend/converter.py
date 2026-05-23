@@ -13,7 +13,6 @@ def convert_to_pdf(file_path):
     if ext == ".pdf":
         return file_path
 
-    # DOCX - LibreOffice headless (pixel-perfect)
     elif ext == ".docx":
         try:
             result = subprocess.run(
@@ -27,8 +26,15 @@ def convert_to_pdf(file_path):
                 timeout=60,
                 capture_output=True
             )
+            print("STDOUT:", result.stdout)
+            print("STDERR:", result.stderr)
+            print("PDF exists:", os.path.exists(pdf_path))
             if os.path.exists(pdf_path):
                 return pdf_path
+            else:
+                print("LibreOffice ran but PDF not created")
+        except FileNotFoundError:
+            print("LibreOffice NOT INSTALLED on this system")
         except Exception as e:
             print(f"LibreOffice failed: {e}")
 
